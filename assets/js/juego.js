@@ -1,10 +1,17 @@
-
+// HTML References 
+const btnPedir = document.querySelector('#btnPedir')
+const btnNuevo = document.querySelector('#btnNuevo')
+const btnDetener = document.querySelector('#btnDetener')
+const smallHTML = document.querySelectorAll('small')
+const playerCardsDiv = document.querySelector('#jugador-cartas')
 
 
 let deck = [];
 const tipos = ["C", "D", "H", "S"]
 const specialCases = ["A", "J", "Q", "K"]
 
+let playerPoints = 0;
+compPoints = 0;
 
 // esta funcion crea un nuevo deck con orden aliatorio
 const createDeck = () => {
@@ -21,7 +28,6 @@ const createDeck = () => {
         }
     }
     deck = _.shuffle(deck)
-    console.log(deck);
 };
 
 createDeck()
@@ -32,8 +38,6 @@ const callCard = () => {
         throw 'No ay mas cartas en el deck'
     }
     let card = deck.pop()
-    console.log(card);
-    console.log(deck);
     return card
 }
 
@@ -48,4 +52,25 @@ const cardValue = (card) => {
 }
 
 const valor = cardValue(callCard())
-console.log({ valor });
+
+// events 
+
+btnPedir.addEventListener('click', () => {
+    const card = callCard()
+    playerPoints = playerPoints + cardValue(card)
+    console.log(playerPoints);
+    smallHTML[0].innerText = playerPoints
+
+    const imgCard = document.createElement('img')
+    imgCard.src = `assets/cartas/${card}.png`
+    imgCard.classList.add('carta')
+    playerCardsDiv.append(imgCard)
+
+    if (playerPoints > 21) {
+        console.warn("YOU HAVE LOST THE GAME");
+        btnPedir.disabled = true;
+    } else if (playerPoints === 21) {
+        console.warn("21! You Win");
+        btnPedir.disabled = true;
+    }
+})
