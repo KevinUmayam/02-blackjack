@@ -4,7 +4,7 @@ const btnNuevo = document.querySelector('#btnNuevo')
 const btnDetener = document.querySelector('#btnDetener')
 const smallHTML = document.querySelectorAll('small')
 const playerCardsDiv = document.querySelector('#jugador-cartas')
-
+const compCardsDiv = document.querySelector('#computadora-cartas')
 
 let deck = [];
 const tipos = ["C", "D", "H", "S"]
@@ -41,8 +41,6 @@ const callCard = () => {
     return card
 }
 
-// callCard()
-
 // evaluar el valor de la carta 
 const cardValue = (card) => {
     const value = card.substring(0, card.length - 1);
@@ -51,7 +49,25 @@ const cardValue = (card) => {
         : (value * 1)
 }
 
-const valor = cardValue(callCard())
+//comp turn 
+
+const compTurn = (minPoints) => {
+
+    do {
+        const card = callCard()
+        compPoints = compPoints + cardValue(card)
+        console.log(compPoints);
+        smallHTML[1].innerText = compPoints
+
+        const imgCard = document.createElement('img')
+        imgCard.src = `assets/cartas/${card}.png`
+        imgCard.classList.add('carta')
+        compCardsDiv.append(imgCard)
+        if (minPoints > 21) {
+            break
+        }
+    } while ((compPoints < minPoints) && (minPoints <= 21));
+}
 
 // events 
 
@@ -69,8 +85,17 @@ btnPedir.addEventListener('click', () => {
     if (playerPoints > 21) {
         console.warn("YOU HAVE LOST THE GAME");
         btnPedir.disabled = true;
+        btnDetener.disabled = true;
+        compTurn(playerPoints)
     } else if (playerPoints === 21) {
         console.warn("21! You Win");
         btnPedir.disabled = true;
+        btnDetener.disabled = true;
     }
+})
+
+btnDetener.addEventListener('click', () => {
+    btnDetener.disabled = true;
+    btnDetener.disabled = true;
+    compTurn(playerPoints)
 })
