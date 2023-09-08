@@ -96,6 +96,6 @@ btnPedir.addEventListener('click', () => {
 
 btnDetener.addEventListener('click', () => {
     btnDetener.disabled = true;
-    btnDetener.disabled = true;
+    btnPedir.disabled = true;
     compTurn(playerPoints)
 })
