@@ -1,101 +1,158 @@
-// HTML References 
-const btnPedir = document.querySelector('#btnPedir')
-const btnNuevo = document.querySelector('#btnNuevo')
-const btnDetener = document.querySelector('#btnDetener')
-const smallHTML = document.querySelectorAll('small')
-const playerCardsDiv = document.querySelector('#jugador-cartas')
-const compCardsDiv = document.querySelector('#computadora-cartas')
+/**
+ * 2C = Two of Clubs
+ * 2D = Two of Diamonds
+ * 2H = Two of Hearts
+ * 2S = Two of Spades
+ */
 
 let deck = [];
-const tipos = ["C", "D", "H", "S"]
-const specialCases = ["A", "J", "Q", "K"]
+const tipos = ['C', 'D', 'H', 'S'];
+const especiales = ['A', 'J', 'Q', 'K'];
 
-let playerPoints = 0;
-compPoints = 0;
+let puntosJugador = 0,
+    puntosComputadora = 0;
 
-// esta funcion crea un nuevo deck con orden aliatorio
-const createDeck = () => {
+// Referencias del HTML
+const btnPedir = document.querySelector('#btnPedir');
+const btnDetener = document.querySelector('#btnDetener');
+const btnNuevo = document.querySelector('#btnNuevo');
+
+const divCartasJugador = document.querySelector('#jugador-cartas');
+const divCartasComputadora = document.querySelector('#computadora-cartas');
+
+const puntosHTML = document.querySelectorAll('small');
+
+// Esta función crea un nuevo deck
+const crearDeck = () => {
 
     for (let i = 2; i <= 10; i++) {
         for (let tipo of tipos) {
-            deck.push(i + tipo)
+            deck.push(i + tipo);
         }
     }
 
     for (let tipo of tipos) {
-        for (let special of specialCases) {
-            deck.push(special + tipo)
+        for (let esp of especiales) {
+            deck.push(esp + tipo);
         }
     }
-    deck = _.shuffle(deck)
-};
+    // console.log( deck );
+    deck = _.shuffle(deck);
+    console.log(deck);
+    return deck;
+}
 
-createDeck()
+crearDeck();
 
-// esta funcion me permite agarrar una carta 
-const callCard = () => {
-    if (deck.lenght === 0) {
-        throw 'No ay mas cartas en el deck'
+
+// Esta función me permite tomar una carta
+const pedirCarta = () => {
+
+    if (deck.length === 0) {
+        throw 'No hay cartas en el deck';
     }
-    let card = deck.pop()
-    return card
+    const carta = deck.pop();
+    return carta;
 }
 
-// evaluar el valor de la carta 
-const cardValue = (card) => {
-    const value = card.substring(0, card.length - 1);
-    return (isNaN(value)) ?
-        (value === 'A') ? 11 : 10
-        : (value * 1)
+// pedirCarta();
+const valorCarta = (carta) => {
+
+    const valor = carta.substring(0, carta.length - 1);
+    return (isNaN(valor)) ?
+        (valor === 'A') ? 11 : 10
+        : valor * 1;
 }
 
-//comp turn 
-
-const compTurn = (minPoints) => {
+// turno de la computadora
+const turnoComputadora = (puntosMinimos) => {
 
     do {
-        const card = callCard()
-        compPoints = compPoints + cardValue(card)
-        console.log(compPoints);
-        smallHTML[1].innerText = compPoints
+        const carta = pedirCarta();
 
-        const imgCard = document.createElement('img')
-        imgCard.src = `assets/cartas/${card}.png`
-        imgCard.classList.add('carta')
-        compCardsDiv.append(imgCard)
-        if (minPoints > 21) {
-            break
+        puntosComputadora = puntosComputadora + valorCarta(carta);
+        puntosHTML[1].innerText = puntosComputadora;
+
+        // <img class="carta" src="assets/cartas/2C.png">
+        const imgCarta = document.createElement('img');
+        imgCarta.src = `assets/cartas/${carta}.png`; //3H, JD
+        imgCarta.classList.add('carta');
+        divCartasComputadora.append(imgCarta);
+
+        if (puntosMinimos > 21) {
+            break;
         }
-    } while ((compPoints < minPoints) && (minPoints <= 21));
+
+    } while ((puntosComputadora < puntosMinimos) && (puntosMinimos <= 21));
+
+    setTimeout(() => {
+        if (puntosComputadora === puntosMinimos) {
+            alert('Nadie gana :(');
+        } else if (puntosMinimos > 21) {
+            alert('Computadora gana')
+        } else if (puntosComputadora > 21) {
+            alert('Jugador Gana');
+        } else {
+            alert('Computadora Gana')
+        }
+    }, 100);
 }
 
-// events 
 
+
+// Eventos
 btnPedir.addEventListener('click', () => {
-    const card = callCard()
-    playerPoints = playerPoints + cardValue(card)
-    console.log(playerPoints);
-    smallHTML[0].innerText = playerPoints
 
-    const imgCard = document.createElement('img')
-    imgCard.src = `assets/cartas/${card}.png`
-    imgCard.classList.add('carta')
-    playerCardsDiv.append(imgCard)
+    const carta = pedirCarta();
 
-    if (playerPoints > 21) {
-        console.warn("YOU HAVE LOST THE GAME");
+    puntosJugador = puntosJugador + valorCarta(carta);
+    puntosHTML[0].innerText = puntosJugador;
+
+    // <img class="carta" src="assets/cartas/2C.png">
+    const imgCarta = document.createElement('img');
+    imgCarta.src = `assets/cartas/${carta}.png`; //3H, JD
+    imgCarta.classList.add('carta');
+    divCartasJugador.append(imgCarta);
+
+    if (puntosJugador > 21) {
+        console.warn('Lo siento mucho, perdiste');
         btnPedir.disabled = true;
         btnDetener.disabled = true;
-        compTurn(playerPoints)
-    } else if (playerPoints === 21) {
-        console.warn("21! You Win");
+        turnoComputadora(puntosJugador);
+
+    } else if (puntosJugador === 21) {
+        console.warn('21, genial!');
         btnPedir.disabled = true;
         btnDetener.disabled = true;
+        turnoComputadora(puntosJugador);
     }
-})
+
+});
+
 
 btnDetener.addEventListener('click', () => {
-    btnDetener.disabled = true;
     btnPedir.disabled = true;
-    compTurn(playerPoints)
-})
+    btnDetener.disabled = true;
+
+    turnoComputadora(puntosJugador);
+});
+
+btnNuevo.addEventListener('click', () => {
+
+    console.clear();
+    deck = [];
+    deck = crearDeck();
+
+    puntosJugador = 0;
+    puntosComputadora = 0;
+
+    puntosHTML[0].innerText = 0;
+    puntosHTML[1].innerText = 0;
+
+    divCartasComputadora.innerHTML = '';
+    divCartasJugador.innerHTML = '';
+
+    btnPedir.disabled = false;
+    btnDetener.disabled = false;
+
+});
